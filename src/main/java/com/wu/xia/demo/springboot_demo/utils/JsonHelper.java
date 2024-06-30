@@ -8,6 +8,7 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -19,7 +20,7 @@ public class JsonHelper {
     }
 
     private static ObjectMapper mapper = new ObjectMapper();
-    
+
     public static <T> T parse(String json, Class clazz){
         try {
             return (T) mapper.readValue(json, clazz);
@@ -28,7 +29,7 @@ public class JsonHelper {
             return null;
         }
     }
-    
+
     public static List<User> parseList(String json){
         try {
             return mapper.readValue(json, new TypeReference<List<User>>() {
@@ -51,7 +52,7 @@ public class JsonHelper {
 
     public void writeFile(String file, Object content) throws Exception {
         try{
-            mapper.writeValue(new File(new ClassPathResource("user.json").getURI()),content);
+            mapper.writeValue(new File(System.getProperty("user.dir")+"/user.json"),content);
         } catch (Exception ex) {
             log.error("{} 写入文件 {} 失败", content, file);
             throw new Exception(ex);
@@ -60,13 +61,12 @@ public class JsonHelper {
 
 
     public static String readUserInfo() throws Exception {
-        ClassPathResource resource = new ClassPathResource("user.json");
-        try(InputStream inputStream = resource.getInputStream()) {
+        try(InputStream inputStream = new FileInputStream(System.getProperty("user.dir")+"/user.json")) {
             return IOUtils.toString(inputStream, String.valueOf(StandardCharsets.UTF_8));
         } catch (Exception e) {
             log.error("读取用户信息失败");
             throw new Exception(e);
         }
     }
-    
+
 }
